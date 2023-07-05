@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
@@ -12,19 +12,11 @@ import {
 } from './Form.styled';
 
 
+const Form = ({ onSubmit }) => {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-export default class Form extends Component {
-    
-  static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-  };
-
-  state = {
-    name: '',
-    number: '',
-  };
-
-  submitHandler = e => {
+  const submitHandler = e => {
     e.preventDefault();
     const nameExp = new RegExp(
       "^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
@@ -33,7 +25,7 @@ export default class Form extends Component {
     
     if (!e.target.elements.name.value.match(nameExp)) {
       Notify.warning('Oops... Unfortunatelly, something wrong with NAME. Check it and try one more time!')
-      return 
+      return
     }
 
     if (!e.target.elements.number.value.match(numberExp)) {
@@ -43,26 +35,35 @@ export default class Form extends Component {
       return
     }
     const id = nanoid();
-    this.props.onSubmit(id, this.state.name, this.state.number);
-    this.setState({ name: '', number: '' });
+    onSubmit(id, name, number);
+    setName('')
+    setNumber('')
   };
 
-  onInputChange = e => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
+  const onInputChange = e => {
+    switch (e.target.name) {
+      case 'name':
+        setName(e.target.value)
+        break;
+      case 'number':
+        setNumber(e.target.value)
+        break;  
+      default:
+        return
+    };
+  }
 
-  render() {
     return (
-      <FormTag onSubmit={this.submitHandler}>
+      <FormTag onSubmit={submitHandler}>
         <Lable>
           Name
           <Input
             type="text"
             name="name"
-            value={this.state.name}
+            value={name}
             title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             required
-            onChange={this.onInputChange}
+            onChange={onInputChange}
           />
         </Lable>
         <Lable>
@@ -70,14 +71,19 @@ export default class Form extends Component {
           <Input
             type="tel"
             name="number"
-            value={this.state.number.trim()}
+            value={number.trim()}
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
             required
-            onChange={this.onInputChange}
+            onChange={onInputChange}
           />
         </Lable>
         <Button type="submit">Add contact</Button>
       </FormTag>
     );
   }
+
+Form.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
 }
+
+export default Form
