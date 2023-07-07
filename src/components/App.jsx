@@ -6,6 +6,7 @@ import Title from './Title/Title';
 import Form from './Form/Form';
 import Contact from './Contact/Contact';
 import Filter from './Filter/Filter';
+import { Notify } from 'notiflix';
 
 const App = props => {
   const [contacts, setContacts] = useState([]);
@@ -30,6 +31,9 @@ const App = props => {
     );
     if (!isContactExist) {
       setContacts(prev => [{ id, name, number },  ...prev]);
+    }
+    else {
+      Notify.warning('Sorry, but this NAME has already exist!')
     }
   };
 
